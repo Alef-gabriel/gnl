@@ -6,13 +6,27 @@
 /*   By: algabrie <alefgabrielr@gmail.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/20 10:48:09 by algabrie          #+#    #+#             */
-/*   Updated: 2021/09/28 13:08:18 by algabrie         ###   ########.fr       */
+/*   Updated: 2021/09/29 17:51:23 by algabrie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-void	ft_bzero(void *s, size_t n)
+void	ft_delete(char **buf)
+{
+	int		i;
+
+	i = 0;
+	if (*buf)
+	{
+		while ((*buf)[i])
+			(*buf)[i++] = 0;
+		free(*buf);
+		*buf = NULL;
+	}
+}
+
+void	ft_bzero(char *s, size_t n)
 {
 	while (n)
 	{
@@ -33,22 +47,9 @@ void	*ft_calloc(size_t nmemb, size_t size)
 	return (p);
 }
 
-void	ft_organizer(char *ptr, int i)
-{
-	int		j;
-
-	j = 0;
-	while (ptr[i])
-	{
-		ptr[j] = ptr[i];
-		i++;
-		j++;
-	}
-	ft_bzero(ptr + j, (BUFFER_SIZE + 1) - j);
-}
-
 char	*ft_strlast(char *p)
 {
+
 	while (*p)
 		p++;
 	return (p);
@@ -61,5 +62,7 @@ int	ft_strlen(char *buf)
 	i = 0;
 	while (buf[i])
 		i++;
-	return (i);
+	if (i > 0)
+		return (BUFFER_SIZE);
+	return (0);
 }
