@@ -6,13 +6,13 @@
 /*   By: algabrie <alefgabrielr@gmail.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/25 18:37:32 by algabrie          #+#    #+#             */
-/*   Updated: 2021/09/29 18:57:02 by algabrie         ###   ########.fr       */
+/*   Updated: 2021/09/30 00:08:21 by algabrie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-static int	ft_lenbuf(char *buff)
+static int	cont_until_new_line(char *buff)
 {
 	int		i;
 
@@ -32,7 +32,7 @@ static int	ft_lenbuf(char *buff)
 	return (i);
 }
 
-static int	ft_strcut(char *line, char *new_line)
+static int	cut_line_for_new_line(char *line, char *new_line)
 {
 	int		i;
 
@@ -49,48 +49,49 @@ static int	ft_strcut(char *line, char *new_line)
 	return (i);
 }
 
-char	*ft_organizer(char *ptr)
+static char	*buf_organizer(char *buf)
 {
-	int		j;
-	int		c;
+	int		save_stance;
+	int		len_buf;
 	char	*save;
-	int		i;
+	int		buf_stance;
 
-	i = ft_lenbuf(ptr);
-	c = i;
-	j = 0;
-	while (ptr[c])
-		c++;
-	if (c - i == 0)
+	buf_stance = cont_until_new_line(buf);
+	len_buf = buf_stance;
+	save_stance = 0;
+	while (buf[len_buf])
+		len_buf++;
+	if (len_buf - buf_stance == 0)
 	{
-		ft_delete(&ptr);
+		ft_delete(&buf);
 		return (0);
 	}
-	save = (char *)ft_calloc(sizeof(char), (c - i) + 1);
-	while (ptr[i])
-		save[j++] = ptr[i++];
-	ft_delete(&ptr);
+	save = (char *)ft_calloc(sizeof(char), (len_buf - buf_stance) + 1);
+	while (buf[buf_stance])
+		save[save_stance++] = buf[buf_stance++];
+	ft_delete(&buf);
 	return (save);
 }
 
-static char	*ft_newcat(char *line, char *buf, char *end_line)
+static char	*make_new_line(char *line, char *buf, char *next_line_bool)
 {
 	char	*new_line;
-	int		new_line_cont;
-	int		buf_cont;
+	int		new_line_stance;
+	int		buf_stance;
 
-	new_line = (char *)ft_calloc(1, ft_lenbuf(line) + ft_lenbuf(buf) + 1);
-	new_line_cont = ft_strcut(line, new_line);
-	buf_cont = 0;
-	while (buf[buf_cont])
+	new_line = (char *)ft_calloc(1, cont_until_new_line(line)
+			+ cont_until_new_line(buf) + 1);
+	new_line_stance = cut_line_for_new_line(line, new_line);
+	buf_stance = 0;
+	while (buf[buf_stance])
 	{
-		new_line[new_line_cont++] = buf[buf_cont];
-		if (buf[buf_cont] == '\n')
+		new_line[new_line_stance++] = buf[buf_stance];
+		if (buf[buf_stance] == '\n')
 		{
-			*end_line = 0;
+			*next_line_bool = 0;
 			break ;
 		}
-		buf_cont++;
+		buf_stance++;
 	}
 	return (new_line);
 }
@@ -99,26 +100,26 @@ char	*get_next_line(int fd)
 {
 	static char	*buf = NULL;
 	char		*line;
-	char		*end_line;
+	char		*next_line_bool;
 	int			size_read;
 
-	end_line = (char *)ft_calloc(sizeof(char), 2);
-	*end_line = '1';
+	next_line_bool = (char *)ft_calloc(sizeof(char), 2);
+	*next_line_bool = '1';
 	line = NULL;
-	while (*end_line)
+	while (*next_line_bool)
 	{
 		if (!buf)
 			buf = (char *)ft_calloc(sizeof(char), BUFFER_SIZE + 1);
-		size_read = read(fd, buf, BUFFER_SIZE - ft_strlen(buf));
+		size_read = read(fd, buf, BUFFER_SIZE - ft_buf_verify(buf));
 		if (!(*buf) && (size_read == 0 || size_read == -1))
 		{
 			ft_delete(&buf);
-			ft_delete(&end_line);
+			ft_delete(&next_line_bool);
 			return (line);
 		}
-		line = ft_newcat(line, buf, end_line);
-		buf = ft_organizer(buf);
+		line = make_new_line(line, buf, next_line_bool);
+		buf = buf_organizer(buf);
 	}
-	ft_delete(&end_line);
+	ft_delete(&next_line_bool);
 	return (line);
 }

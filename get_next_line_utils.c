@@ -6,7 +6,7 @@
 /*   By: algabrie <alefgabrielr@gmail.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/20 10:48:09 by algabrie          #+#    #+#             */
-/*   Updated: 2021/09/29 17:51:23 by algabrie         ###   ########.fr       */
+/*   Updated: 2021/09/29 23:55:21 by algabrie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,22 +47,9 @@ void	*ft_calloc(size_t nmemb, size_t size)
 	return (p);
 }
 
-char	*ft_strlast(char *p)
+int	ft_buf_verify(char *buf)
 {
-
-	while (*p)
-		p++;
-	return (p);
-}
-
-int	ft_strlen(char *buf)
-{
-	int		i;
-
-	i = 0;
-	while (buf[i])
-		i++;
-	if (i > 0)
+	if (*buf)
 		return (BUFFER_SIZE);
 	return (0);
 }
